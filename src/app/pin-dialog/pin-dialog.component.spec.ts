@@ -1,7 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 
 import { PinDialogComponent } from './pin-dialog.component';
 import { createOverlayControllerMock } from '../../../test/mocks';
@@ -10,21 +9,19 @@ describe('PinDialogComponent', () => {
   let component: PinDialogComponent;
   let fixture: ComponentFixture<PinDialogComponent>;
 
+  const modalController = createOverlayControllerMock('ModalController');
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [PinDialogComponent],
-      imports: [FormsModule, IonicModule],
-      providers: [
-        {
-          provide: ModalController,
-          useFactory: () => createOverlayControllerMock('Modal'),
-        },
-      ],
+      imports: [PinDialogComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    }).compileComponents();
+    })
+      .overrideProvider(ModalController, { useValue: modalController })
+      .compileComponents();
   });
 
   beforeEach(() => {
+    (modalController.dismiss as jasmine.Spy).calls.reset();
     fixture = TestBed.createComponent(PinDialogComponent);
     component = fixture.componentInstance;
   });
@@ -181,7 +178,6 @@ describe('PinDialogComponent', () => {
 
       describe('first call', () => {
         it('does not dismiss', () => {
-          const modalController = TestBed.inject(ModalController);
           component.pin = '88395';
           component.enter();
           expect(modalController.dismiss).not.toHaveBeenCalled();
@@ -213,12 +209,10 @@ describe('PinDialogComponent', () => {
           });
 
           it('dismisses if the dialog', () => {
-            const modalController = TestBed.inject(ModalController);
             expect(modalController.dismiss).toHaveBeenCalledTimes(1);
           });
 
           it('returns the PIN', () => {
-            const modalController = TestBed.inject(ModalController);
             expect(modalController.dismiss).toHaveBeenCalledWith('88395');
           });
         });
@@ -230,7 +224,6 @@ describe('PinDialogComponent', () => {
           });
 
           it('does not close the modal', () => {
-            const modalController = TestBed.inject(ModalController);
             expect(modalController.dismiss).not.toHaveBeenCalled();
           });
 
@@ -256,13 +249,11 @@ describe('PinDialogComponent', () => {
       });
 
       it('dismisses the dialog', () => {
-        const modalController = TestBed.inject(ModalController);
         component.enter();
         expect(modalController.dismiss).toHaveBeenCalledTimes(1);
       });
 
       it('passes back the entered PIN', () => {
-        const modalController = TestBed.inject(ModalController);
         component.pin = '88395';
         component.enter();
         expect(modalController.dismiss).toHaveBeenCalledWith('88395');

@@ -1,5 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { Component, forwardRef, Input, HostBinding } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-rating',
@@ -12,6 +14,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       multi: true,
     },
   ],
+  standalone: true,
+  imports: [CommonModule, IonicModule],
 })
 export class RatingComponent implements ControlValueAccessor {
   @Input() rating: number;

@@ -1,10 +1,9 @@
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { TastingNotesService, TeaCategoriesService } from '@app/core';
 import { createTastingNotesServiceMock, createTeaCategoriesServiceMock } from '@app/core/testing';
 import { TeaCategory } from '@app/models';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { createOverlayControllerMock } from '@test/mocks';
 import { click } from '@test/util';
 
@@ -14,17 +13,18 @@ describe('TastingNoteEditorComponent', () => {
   let categories: Array<TeaCategory>;
   let component: TastingNoteEditorComponent;
   let fixture: ComponentFixture<TastingNoteEditorComponent>;
+  let modalController: ModalController;
 
   beforeEach(waitForAsync(() => {
+    modalController = createOverlayControllerMock('ModalController');
     TestBed.configureTestingModule({
-      declarations: [TastingNoteEditorComponent],
-      imports: [FormsModule, IonicModule],
-      providers: [
-        { provide: ModalController, useFactory: () => createOverlayControllerMock('ModalController') },
-        { provide: TastingNotesService, useFactory: createTastingNotesServiceMock },
-        { provide: TeaCategoriesService, useFactory: createTeaCategoriesServiceMock },
-      ],
-    }).compileComponents();
+      imports: [TastingNoteEditorComponent],
+      providers: [],
+    })
+      .overrideProvider(ModalController, { useValue: modalController })
+      .overrideProvider(TastingNotesService, { useFactory: createTastingNotesServiceMock })
+      .overrideProvider(TeaCategoriesService, { useFactory: createTeaCategoriesServiceMock })
+      .compileComponents();
 
     initializeTestData();
 
@@ -132,7 +132,6 @@ describe('TastingNoteEditorComponent', () => {
 
       it('dismisses the modal', fakeAsync(() => {
         const button = fixture.debugElement.query(By.css('[data-testid="save-button"]'));
-        const modalController = TestBed.inject(ModalController);
         click(fixture, button.nativeElement);
         tick();
         expect(modalController.dismiss).toHaveBeenCalledTimes(1);
@@ -175,7 +174,6 @@ describe('TastingNoteEditorComponent', () => {
 
       it('dismisses the modal', fakeAsync(() => {
         const button = fixture.debugElement.query(By.css('[data-testid="save-button"]'));
-        const modalController = TestBed.inject(ModalController);
         click(fixture, button.nativeElement);
         tick();
         expect(modalController.dismiss).toHaveBeenCalledTimes(1);
@@ -203,7 +201,6 @@ describe('TastingNoteEditorComponent', () => {
 
     it('dismisses the modal', fakeAsync(() => {
       const button = fixture.debugElement.query(By.css('[data-testid="close-button"]'));
-      const modalController = TestBed.inject(ModalController);
       click(fixture, button.nativeElement);
       tick();
       expect(modalController.dismiss).toHaveBeenCalledTimes(1);

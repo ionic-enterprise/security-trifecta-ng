@@ -1,12 +1,17 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { TastingNotesService, TeaCategoriesService } from '@app/core';
 import { TastingNote, TeaCategory } from '@app/models';
-import { ModalController } from '@ionic/angular';
+import { RatingComponent } from '@app/rating/rating.component';
+import { IonicModule, ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tasting-note-editor',
   templateUrl: './tasting-note-editor.component.html',
   styleUrls: ['./tasting-note-editor.component.scss'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonicModule, RatingComponent],
 })
 export class TastingNoteEditorComponent implements OnInit {
   @Input() note: TastingNote;

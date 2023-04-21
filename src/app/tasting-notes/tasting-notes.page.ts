@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import {
   AuthenticationService,
   PreferencesService,
@@ -9,13 +11,15 @@ import {
 } from '@app/core';
 import { TastingNote } from '@app/models';
 import { TastingNoteEditorComponent } from '@app/tasting-note-editor/tasting-note-editor.component';
-import { ModalController, ModalOptions, NavController, ToastController } from '@ionic/angular';
+import { IonicModule, ModalController, ModalOptions, NavController, ToastController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-tasting-notes',
   templateUrl: 'tasting-notes.page.html',
   styleUrls: ['tasting-notes.page.scss'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonicModule, TastingNoteEditorComponent],
 })
 export class TastingNotesPage implements OnInit {
   notes: Array<TastingNote> = [];

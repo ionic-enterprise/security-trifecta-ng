@@ -1,11 +1,16 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AuthenticationService, SessionVaultService } from '@app/core';
+import { IonicModule } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-login-card',
   templateUrl: './login-card.component.html',
   styleUrls: ['./login-card.component.scss'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonicModule],
 })
 export class LoginCardComponent {
   @Output() loginSuccess = new EventEmitter<void>();

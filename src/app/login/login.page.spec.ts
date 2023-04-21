@@ -1,14 +1,11 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { SessionVaultService, SyncService } from '@app/core';
 import { createSessionVaultServiceMock, createSyncServiceMock } from '@app/core/testing';
 import { IonicModule, NavController } from '@ionic/angular';
 import { createNavControllerMock } from '@test/mocks';
-import { LoginCardComponent } from './login-card/login-card.component';
 import { LoginPage } from './login.page';
-import { UnlockCardComponent } from './unlock-card/unlock-card.component';
 
 describe('LoginPage', () => {
   let component: LoginPage;
@@ -16,14 +13,12 @@ describe('LoginPage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [LoginPage, LoginCardComponent, UnlockCardComponent],
-      imports: [FormsModule, HttpClientTestingModule, IonicModule],
-      providers: [
-        { provide: NavController, useFactory: createNavControllerMock },
-        { provide: SessionVaultService, useFactory: createSessionVaultServiceMock },
-        { provide: SyncService, useFactory: createSyncServiceMock },
-      ],
-    }).compileComponents();
+      imports: [LoginPage, HttpClientTestingModule, IonicModule],
+    })
+      .overrideProvider(NavController, { useFactory: createNavControllerMock })
+      .overrideProvider(SessionVaultService, { useFactory: createSessionVaultServiceMock })
+      .overrideProvider(SyncService, { useFactory: createSyncServiceMock })
+      .compileComponents();
   });
 
   const buildComponent = (sessionIsLocked: boolean) => {

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
 import { RatingComponent } from './rating.component';
 
 @Component({
@@ -23,8 +22,8 @@ describe('RatingComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [RatingComponent, TestHostComponent],
-      imports: [FormsModule, IonicModule],
+      declarations: [TestHostComponent],
+      imports: [FormsModule, RatingComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TestHostComponent);

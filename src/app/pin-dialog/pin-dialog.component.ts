@@ -1,10 +1,14 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, Input } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
+import { IonicModule, ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-pin-dialog',
   templateUrl: './pin-dialog.component.html',
   styleUrls: ['./pin-dialog.component.scss'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonicModule],
 })
 export class PinDialogComponent implements OnInit {
   @Input() setPasscodeMode: boolean;

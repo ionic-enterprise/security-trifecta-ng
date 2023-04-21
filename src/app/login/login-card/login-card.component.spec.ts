@@ -1,9 +1,7 @@
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { AuthenticationService, SessionVaultService } from '@app/core';
 import { createAuthenticationServiceMock, createSessionVaultServiceMock } from '@app/core/testing';
-import { IonicModule } from '@ionic/angular';
 import { click, setInputValue } from '@test/util';
 import { of } from 'rxjs';
 
@@ -15,13 +13,11 @@ describe('LoginCardComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [LoginCardComponent],
-      imports: [FormsModule, IonicModule.forRoot()],
-      providers: [
-        { provide: AuthenticationService, useFactory: createAuthenticationServiceMock },
-        { provide: SessionVaultService, useFactory: createSessionVaultServiceMock },
-      ],
-    }).compileComponents();
+      imports: [LoginCardComponent],
+    })
+      .overrideProvider(AuthenticationService, { useFactory: createAuthenticationServiceMock })
+      .overrideProvider(SessionVaultService, { useFactory: createSessionVaultServiceMock })
+      .compileComponents();
 
     fixture = TestBed.createComponent(LoginCardComponent);
     component = fixture.componentInstance;

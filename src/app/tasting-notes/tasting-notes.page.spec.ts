@@ -1,5 +1,4 @@
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import {
   AuthenticationService,
@@ -19,8 +18,7 @@ import {
 } from '@app/core/testing';
 import { TastingNote } from '@app/models';
 import { TastingNoteEditorComponent } from '@app/tasting-note-editor/tasting-note-editor.component';
-import { TastingNoteEditorModule } from '@app/tasting-note-editor/tasting-note-editor.module';
-import { IonicModule, ModalController, NavController, ToastController } from '@ionic/angular';
+import { ModalController, NavController, ToastController } from '@ionic/angular';
 import { createNavControllerMock, createOverlayControllerMock, createOverlayElementMock } from '@test/mocks';
 import { click } from '@test/util';
 import { of } from 'rxjs';
@@ -32,26 +30,29 @@ describe('TastingNotesPage', () => {
   let modal: HTMLIonModalElement;
   let toast: HTMLIonToastElement;
   let notes: Array<TastingNote>;
+  let modalController: ModalController;
+  let toastController: ToastController;
 
   beforeEach(async () => {
     modal = createOverlayElementMock('Modal');
+    modalController = createOverlayControllerMock('ModalController', modal);
     toast = createOverlayElementMock('Toast');
+    toastController = createOverlayControllerMock('TaastController', toast);
 
     await TestBed.configureTestingModule({
-      declarations: [TastingNotesPage],
-      imports: [FormsModule, IonicModule, TastingNoteEditorModule],
-      providers: [
-        { provide: AuthenticationService, useFactory: createAuthenticationServiceMock },
-        { provide: ModalController, useFactory: () => createOverlayControllerMock('ModalController', modal) },
-        { provide: NavController, useFactory: createNavControllerMock },
-        { provide: PreferencesService, useFactory: createPreferencesServiceMock },
-        { provide: SessionVaultService, useFactory: createSessionVaultServiceMock },
-        { provide: SyncService, useFactory: createSyncServiceMock },
-        { provide: TastingNotesService, useFactory: createTastingNotesServiceMock },
-        { provide: TeaCategoriesService, useFactory: createTeaCategoriesServiceMock },
-        { provide: ToastController, useFactory: () => createOverlayControllerMock('TaastController', toast) },
-      ],
-    }).compileComponents();
+      imports: [TastingNotesPage],
+      providers: [],
+    })
+      .overrideProvider(AuthenticationService, { useFactory: createAuthenticationServiceMock })
+      .overrideProvider(ModalController, { useValue: modalController })
+      .overrideProvider(NavController, { useFactory: createNavControllerMock })
+      .overrideProvider(PreferencesService, { useFactory: createPreferencesServiceMock })
+      .overrideProvider(SessionVaultService, { useFactory: createSessionVaultServiceMock })
+      .overrideProvider(SyncService, { useFactory: createSyncServiceMock })
+      .overrideProvider(TastingNotesService, { useFactory: createTastingNotesServiceMock })
+      .overrideProvider(TeaCategoriesService, { useFactory: createTeaCategoriesServiceMock })
+      .overrideProvider(ToastController, { useValue: toastController })
+      .compileComponents();
 
     initializeTestData();
 
@@ -105,7 +106,6 @@ describe('TastingNotesPage', () => {
   describe('adding a note', () => {
     it('creates a modal', fakeAsync(() => {
       const button = fixture.debugElement.query(By.css('[data-testid="add-note-button"]'));
-      const modalController = TestBed.inject(ModalController);
       click(fixture, button.nativeElement);
       tick();
       expect(modalController.create).toHaveBeenCalledTimes(1);
@@ -132,7 +132,6 @@ describe('TastingNotesPage', () => {
       fixture.detectChanges();
       const items = fixture.nativeElement.querySelectorAll('ion-item');
       const item = items[1] as HTMLIonItemElement;
-      const modalController = TestBed.inject(ModalController);
       click(fixture, item);
       tick();
       expect(modalController.create).toHaveBeenCalledTimes(1);
