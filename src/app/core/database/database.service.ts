@@ -62,7 +62,7 @@ export class DatabaseService {
         { name: 'notes', type: 'TEXT' },
         { name: 'rating', type: 'INTEGER' },
         { name: 'teaCategoryId', type: 'INTEGER' },
-        { name: 'userId', type: 'INTEGER' },
+        { name: 'userEmail', type: 'TEXT' },
         syncStatus,
       ])
     );

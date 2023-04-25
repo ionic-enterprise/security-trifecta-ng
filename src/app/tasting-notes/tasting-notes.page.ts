@@ -12,7 +12,6 @@ import {
 import { TastingNote } from '@app/models';
 import { TastingNoteEditorComponent } from '@app/tasting-note-editor/tasting-note-editor.component';
 import { IonicModule, ModalController, ModalOptions, NavController, ToastController } from '@ionic/angular';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-tasting-notes',
@@ -46,7 +45,7 @@ export class TastingNotesPage implements OnInit {
   }
 
   async logout(): Promise<void> {
-    await firstValueFrom(this.authentication.logout());
+    await this.authentication.logout();
     await this.sessionVault.clearSession();
     this.navController.navigateRoot(['/', 'login']);
   }

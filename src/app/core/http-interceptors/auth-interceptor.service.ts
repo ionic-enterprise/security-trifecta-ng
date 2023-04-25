@@ -2,21 +2,21 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Injectable } from '@angular/core';
 import { from, Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
-import { SessionVaultService } from '../session-vault/session-vault.service';
+import { AuthenticationService } from '../authentication/authentication.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private vault: SessionVaultService) {}
+  constructor(private authentication: AuthenticationService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return from(
       this.requestRequiresToken(req)
-        ? this.vault.getSession().then((session) => {
-            if (session) {
+        ? this.authentication.getAccessToken().then((token) => {
+            if (token) {
               req = req.clone({
                 setHeaders: {
                   // eslint-disable-next-line @typescript-eslint/naming-convention
-                  Authorization: 'Bearer ' + session.token,
+                  Authorization: 'Bearer ' + token,
                 },
               });
             }

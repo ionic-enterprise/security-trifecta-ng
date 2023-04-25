@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/quotes */
 import { Injectable } from '@angular/core';
 import { TastingNote } from '@app/models';
+import { AuthenticationService } from '../authentication/authentication.service';
 import { DatabaseService } from '../database/database.service';
 import { SessionVaultService } from '../session-vault/session-vault.service';
 
@@ -8,20 +9,24 @@ import { SessionVaultService } from '../session-vault/session-vault.service';
   providedIn: 'root',
 })
 export class TastingNotesDatabaseService {
-  constructor(private database: DatabaseService, private vault: SessionVaultService) {}
+  constructor(
+    private database: DatabaseService,
+    private vault: SessionVaultService,
+    private authentication: AuthenticationService
+  ) {}
 
   async getAll(includeDeleted = false): Promise<Array<TastingNote>> {
     const notes: Array<TastingNote> = [];
     const handle = await this.database.getHandle();
     if (handle) {
-      const { user } = await this.vault.getSession();
+      const email = await this.authentication.getUserEmail();
       const predicate = includeDeleted
-        ? 'userId = ? ORDER BY name'
-        : "coalesce(syncStatus, '') != 'DELETE' AND userId = ? ORDER BY brand, name";
+        ? 'userEmail = ? ORDER BY name'
+        : "coalesce(syncStatus, '') != 'DELETE' AND userEmail = ? ORDER BY brand, name";
       await handle.transaction((tx) =>
         tx.executeSql(
           `SELECT id, name, brand, notes, rating, teaCategoryId, syncStatus FROM TastingNotes WHERE ${predicate}`,
-          [user.id],
+          [email],
           // tslint:disable-next-line:variable-name
           (_t: any, r: any) => {
             for (let i = 0; i < r.rows.length; i++) {
@@ -37,16 +42,16 @@ export class TastingNotesDatabaseService {
   async clearSyncStatuses(): Promise<void> {
     const handle = await this.database.getHandle();
     if (handle) {
-      const { user } = await this.vault.getSession();
+      const email = await this.authentication.getUserEmail();
       await handle.transaction((tx) => {
         tx.executeSql(
-          "UPDATE TastingNotes SET syncStatus = null WHERE syncStatus = 'UPDATE' AND userId = ?",
-          [user.id],
+          "UPDATE TastingNotes SET syncStatus = null WHERE syncStatus = 'UPDATE' AND userEmail = ?",
+          [email],
           () => {}
         );
         tx.executeSql(
-          "DELETE FROM TastingNotes WHERE syncStatus in ('DELETE', 'INSERT') AND userId = ?",
-          [user.id],
+          "DELETE FROM TastingNotes WHERE syncStatus in ('DELETE', 'INSERT') AND userEmail = ?",
+          [email],
           () => {}
         );
       });
@@ -56,11 +61,11 @@ export class TastingNotesDatabaseService {
   async remove(note: TastingNote): Promise<void> {
     const handle = await this.database.getHandle();
     if (handle) {
-      const { user } = await this.vault.getSession();
+      const email = await this.authentication.getUserEmail();
       await handle.transaction((tx) => {
         tx.executeSql(
-          "UPDATE TastingNotes SET syncStatus = 'DELETE' WHERE userId = ? AND id = ?",
-          [user.id, note.id],
+          "UPDATE TastingNotes SET syncStatus = 'DELETE' WHERE userEmail = ? AND id = ?",
+          [email, note.id],
           () => {}
         );
       });
@@ -71,11 +76,11 @@ export class TastingNotesDatabaseService {
     const handle = await this.database.getHandle();
     const idsToKeep = notes.map((note) => note.id);
     if (handle) {
-      const { user } = await this.vault.getSession();
+      const email = await this.authentication.getUserEmail();
       await handle.transaction((tx) => {
         tx.executeSql(
-          `DELETE FROM TastingNotes WHERE userId = ? AND id not in (${this.params(idsToKeep.length)})`,
-          [user.id, ...idsToKeep],
+          `DELETE FROM TastingNotes WHERE userEmail = ? AND id not in (${this.params(idsToKeep.length)})`,
+          [email, ...idsToKeep],
           () => {}
         );
       });
@@ -89,13 +94,13 @@ export class TastingNotesDatabaseService {
   async upsert(note: TastingNote): Promise<void> {
     const handle = await this.database.getHandle();
     if (handle) {
-      const { user } = await this.vault.getSession();
+      const email = await this.authentication.getUserEmail();
       await handle.transaction((tx) => {
         tx.executeSql(
-          'INSERT INTO TastingNotes (id, name, brand, notes, rating, teaCategoryId, userId) VALUES (?, ?, ?, ?, ?, ?, ?)' +
+          'INSERT INTO TastingNotes (id, name, brand, notes, rating, teaCategoryId, userEmail) VALUES (?, ?, ?, ?, ?, ?, ?)' +
             ' ON CONFLICT(id) DO' +
             ' UPDATE SET name = ?, brand = ?, notes = ?, rating = ?, teaCategoryId = ?' +
-            ' WHERE syncStatus is NULL AND userId = ? AND id = ?',
+            ' WHERE syncStatus is NULL AND userEmail = ? AND id = ?',
           [
             note.id,
             note.name,
@@ -103,13 +108,13 @@ export class TastingNotesDatabaseService {
             note.notes,
             note.rating,
             note.teaCategoryId,
-            user.id,
+            email,
             note.name,
             note.brand,
             note.notes,
             note.rating,
             note.teaCategoryId,
-            user.id,
+            email,
             note.id,
           ],
           () => {}
@@ -121,7 +126,7 @@ export class TastingNotesDatabaseService {
   async add(note: TastingNote): Promise<TastingNote | undefined> {
     const handle = await this.database.getHandle();
     if (handle) {
-      const { user } = await this.vault.getSession();
+      const email = await this.authentication.getUserEmail();
       await handle.transaction((tx) => {
         tx.executeSql(
           'SELECT COALESCE(MAX(id), 0) + 1 AS newId FROM TastingNotes',
@@ -130,9 +135,9 @@ export class TastingNotesDatabaseService {
           (_t: any, r: any) => {
             note.id = r.rows.item(0).newId;
             tx.executeSql(
-              'INSERT INTO TastingNotes (id, name, brand, notes, rating, teaCategoryId, userId, syncStatus)' +
+              'INSERT INTO TastingNotes (id, name, brand, notes, rating, teaCategoryId, userEmail, syncStatus)' +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, 'INSERT')",
-              [note.id, note.name, note.brand, note.notes, note.rating, note.teaCategoryId, user.id],
+              [note.id, note.name, note.brand, note.notes, note.rating, note.teaCategoryId, email],
               () => {}
             );
           }
@@ -145,13 +150,13 @@ export class TastingNotesDatabaseService {
   async update(note: TastingNote): Promise<TastingNote | undefined> {
     const handle = await this.database.getHandle();
     if (handle) {
-      const { user } = await this.vault.getSession();
+      const email = await this.authentication.getUserEmail();
       await handle.transaction((tx) => {
         tx.executeSql(
           'UPDATE TastingNotes SET name = ?, brand = ?, notes = ?, rating = ?, teaCategoryId = ?,' +
             " syncStatus = CASE syncStatus WHEN 'INSERT' THEN 'INSERT' else 'UPDATE' end" +
-            ' WHERE userId = ? AND id = ?',
-          [note.name, note.brand, note.notes, note.rating, note.teaCategoryId, user.id, note.id],
+            ' WHERE userEmail = ? AND id = ?',
+          [note.name, note.brand, note.notes, note.rating, note.teaCategoryId, email, note.id],
           () => {}
         );
       });

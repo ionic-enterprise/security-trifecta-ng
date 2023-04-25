@@ -1,6 +1,7 @@
 export * from './authentication/authentication.service';
 export * from './compare/compare.service';
 export * from './encryption/encryption.service';
+export * from './guards/auth.guard';
 export * from './http-interceptors/auth-interceptor.service';
 export * from './http-interceptors/unauth-interceptor.service';
 export * from './preferences/preferences.service';

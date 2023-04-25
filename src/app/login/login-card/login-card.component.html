@@ -5,53 +5,15 @@
   </ion-card-header>
 
   <ion-card-content>
-    <form #loginForm="ngForm">
-      <ion-list>
-        <ion-item>
-          <ion-input
-            id="email-input"
-            label="E-Mail Address"
-            label-placement="floating"
-            name="email"
-            type="email"
-            [(ngModel)]="email"
-            #emailInput="ngModel"
-            email
-            required
-          ></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-input
-            id="password-input"
-            label="Password"
-            label-placement="floating"
-            name="password"
-            type="password"
-            [(ngModel)]="password"
-            #passwordInput="ngModel"
-            required
-          ></ion-input>
-        </ion-item>
-      </ion-list>
+    <div>
+      <ion-button id="signin-button" expand="full" color="aws" (click)="signIn()"
+        >Sign In
+        <ion-icon slot="end" name="logo-amazon"></ion-icon>
+      </ion-button>
+    </div>
 
-      <div class="error-message">
-        <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)">
-          <div *ngIf="emailInput.errors.email">E-Mail Address must have a valid format</div>
-          <div *ngIf="emailInput.errors.required">E-Mail Address is required</div>
-        </div>
-
-        <div *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)">
-          <div *ngIf="passwordInput.errors.required">Password is required</div>
-        </div>
-        <div>{{ errorMessage }}</div>
-      </div>
-
-      <div>
-        <ion-button id="signin-button" expand="full" [disabled]="!loginForm.form.valid" (click)="signIn()"
-          >Sign In
-          <ion-icon slot="end" name="log-in-outline"></ion-icon>
-        </ion-button>
-      </div>
-    </form>
+    <div class="error-message">
+      <div>{{ errorMessage }}</div>
+    </div>
   </ion-card-content>
 </ion-card>

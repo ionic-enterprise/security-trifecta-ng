@@ -187,7 +187,7 @@ describe('TastingNotesPage', () => {
     let button: HTMLIonButtonElement;
     beforeEach(() => {
       const auth = TestBed.inject(AuthenticationService);
-      (auth.logout as jasmine.Spy).and.returnValue(of(undefined));
+      (auth.logout as jasmine.Spy).and.resolveTo(undefined);
       button = fixture.nativeElement.querySelector('[data-testid="logout-button"]');
     });
 

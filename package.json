@@ -15,7 +15,7 @@
     "lint": "ng lint",
     "ng": "ng",
     "prepare": "husky install",
-    "start": "ng serve",
+    "start": "ng serve --port=8100",
     "test": "ng test --no-watch",
     "test:dev": "ng test"
   },
@@ -35,6 +35,7 @@
     "@capacitor/keyboard": "^4.0.0",
     "@capacitor/splash-screen": "~4.2.0",
     "@capacitor/status-bar": "^4.0.0",
+    "@ionic-enterprise/auth": "~4.0.0",
     "@ionic-enterprise/identity-vault": "~5.9.0",
     "@ionic-enterprise/secure-storage": "~3.0.0-0",
     "@ionic/angular": "~7.0.0-beta.2",

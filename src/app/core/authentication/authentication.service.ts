@@ -1,32 +1,106 @@
 import { Injectable } from '@angular/core';
-import { Session } from '@app/models';
-import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
-import { map } from 'rxjs/operators';
-
-interface LoginResponse extends Session {
-  success: boolean;
-}
+import { AuthConnect, AuthResult, CognitoProvider, TokenType } from '@ionic-enterprise/auth';
+import { Platform } from '@ionic/angular';
+import { SessionVaultService } from '../session-vault/session-vault.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationService {
-  constructor(private http: HttpClient) {}
+  initializing: Promise<void> | undefined;
 
-  login(email: string, password: string): Observable<Session | undefined> {
-    return this.http.post<Session>(`${environment.dataService}/login`, { username: email, password }).pipe(
-      map((res: LoginResponse) => {
-        const { success, ...session } = res;
-        if (success) {
-          return session;
-        }
-      })
-    );
+  private provider: CognitoProvider;
+  private isMobile: boolean;
+
+  constructor(platform: Platform, private sessionVault: SessionVaultService) {
+    this.provider = new CognitoProvider();
+    this.isMobile = platform.is('hybrid');
   }
 
-  logout(): Observable<any> {
-    return this.http.post(`${environment.dataService}/logout`, {});
+  async login(): Promise<void> {
+    await this.initialize();
+    const authResult = await AuthConnect.login(
+      this.provider,
+      this.isMobile ? environment.mobileAuthConfig : environment.webAuthConfig
+    );
+    this.sessionVault.setSession(authResult as any);
+  }
+
+  async logout(): Promise<void> {
+    await this.initialize();
+    const authResult = await this.sessionVault.getSession();
+    if (authResult) {
+      await AuthConnect.logout(this.provider, authResult as any);
+      await this.sessionVault.clearSession();
+    }
+  }
+
+  async isAuthenticated(): Promise<boolean> {
+    await this.initialize();
+    return !!(await this.getAuthResult());
+  }
+
+  async getAccessToken(): Promise<string | void> {
+    await this.initialize();
+    const authResult = await this.getAuthResult();
+    return authResult?.accessToken;
+  }
+
+  async getUserEmail(): Promise<string | void> {
+    await this.initialize();
+    const authResult = await this.sessionVault.getSession();
+    if (authResult) {
+      const { email } = (await AuthConnect.decodeToken(TokenType.id, authResult as any)) as { email?: string };
+      return email;
+    }
+  }
+
+  private async initialize(): Promise<void> {
+    if (!this.initializing) {
+      this.initializing = new Promise((resolve) => {
+        this.performInit().then(() => resolve());
+      });
+    }
+    return this.initializing;
+  }
+
+  private async performInit(): Promise<void> {
+    await AuthConnect.setup({
+      platform: this.isMobile ? 'capacitor' : 'web',
+      logLevel: 'DEBUG',
+      ios: {
+        webView: 'private',
+      },
+      web: {
+        uiMode: 'popup',
+        authFlow: 'PKCE',
+      },
+    });
+  }
+
+  private async performRefresh(authResult: AuthResult): Promise<AuthResult | undefined> {
+    let newAuthResult: AuthResult | undefined;
+
+    if (await AuthConnect.isRefreshTokenAvailable(authResult)) {
+      try {
+        newAuthResult = await AuthConnect.refreshSession(this.provider, authResult);
+        this.sessionVault.setSession(newAuthResult as any);
+      } catch (err) {
+        await this.sessionVault.clearSession();
+      }
+    } else {
+      await this.sessionVault.clearSession();
+    }
+
+    return newAuthResult;
+  }
+
+  private async getAuthResult(): Promise<AuthResult | null | undefined> {
+    let authResult = (await this.sessionVault.getSession()) as any;
+    if (authResult && (await AuthConnect.isAccessTokenExpired(authResult))) {
+      authResult = await this.performRefresh(authResult);
+    }
+    return authResult;
   }
 }
