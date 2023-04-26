@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthenticationService, SessionVaultService } from '@app/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-login-card',
@@ -14,19 +14,32 @@ import { IonicModule } from '@ionic/angular';
 export class LoginCardComponent {
   @Output() loginSuccess = new EventEmitter<void>();
 
-  email: string;
-  password: string;
+  showSessionLocking: boolean;
+  useSessionLocking: boolean;
   errorMessage: string;
 
-  constructor(private authentication: AuthenticationService, private sessionVault: SessionVaultService) {}
+  constructor(
+    platform: Platform,
+    private authentication: AuthenticationService,
+    private sessionVault: SessionVaultService
+  ) {
+    this.showSessionLocking = platform.is('hybrid');
+  }
 
   async signIn() {
     try {
       await this.authentication.login();
-      await this.sessionVault.initializeUnlockMode();
       this.loginSuccess.emit();
     } catch (err) {
       this.errorMessage = 'Invalid email or password';
+    }
+  }
+
+  async useSessionLockingChanged() {
+    if (this.useSessionLocking) {
+      await this.sessionVault.initializeUnlockMode();
+    } else {
+      await this.sessionVault.resetUnlockMode();
     }
   }
 }

@@ -81,6 +81,18 @@ describe('SessionVaultService', () => {
     expect(service).toBeTruthy();
   });
 
+  describe('reset unlock type', () => {
+    it('updates the lock type to secure storage', async () => {
+      const expectedConfig = {
+        ...mockVault.config,
+        type: VaultType.SecureStorage,
+        deviceSecurityType: DeviceSecurityType.None,
+      };
+      await service.resetUnlockMode();
+      expect(mockVault.updateConfig).toHaveBeenCalledTimes(1);
+      expect(mockVault.updateConfig).toHaveBeenCalledWith(expectedConfig);
+    });
+  });
   describe('initialize unlock type', () => {
     describe('on mobile', () => {
       beforeEach(() => {

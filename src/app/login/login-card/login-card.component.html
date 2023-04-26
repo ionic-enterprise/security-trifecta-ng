@@ -12,7 +12,13 @@
       </ion-button>
     </div>
 
-    <div class="error-message">
+    <div class="ion-padding ion-text-center" *ngIf="showSessionLocking">
+      <ion-checkbox [(ngModel)]="useSessionLocking" (ionChange)="useSessionLockingChanged()"
+        >Use Session Locking</ion-checkbox
+      >
+    </div>
+
+    <div class="error-message ion-text-center">
       <div>{{ errorMessage }}</div>
     </div>
   </ion-card-content>

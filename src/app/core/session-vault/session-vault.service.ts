@@ -34,6 +34,11 @@ export class SessionVaultService {
     return this.lockedSubject.asObservable();
   }
 
+  async resetUnlockMode(): Promise<void> {
+    await this.initialize();
+    await this.setUnlockMode('NeverLock');
+  }
+
   async initializeUnlockMode(): Promise<void> {
     if (this.platform.is('hybrid')) {
       await this.initialize();

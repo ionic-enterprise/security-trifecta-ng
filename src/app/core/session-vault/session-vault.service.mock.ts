@@ -5,6 +5,7 @@ export const createSessionVaultServiceMock = () =>
     clearSession: Promise.resolve(),
     getSession: Promise.resolve(null),
     initializeUnlockMode: Promise.resolve(),
+    resetUnlockMode: Promise.resolve(),
     sessionIsLocked: Promise.resolve(false),
     setSession: Promise.resolve(),
     unlockSession: Promise.resolve(),

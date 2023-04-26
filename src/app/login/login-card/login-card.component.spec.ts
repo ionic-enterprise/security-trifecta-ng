@@ -2,9 +2,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { By } from '@angular/platform-browser';
 import { AuthenticationService, SessionVaultService } from '@app/core';
 import { createAuthenticationServiceMock, createSessionVaultServiceMock } from '@app/core/testing';
-import { click, setInputValue } from '@test/util';
-import { of } from 'rxjs';
-
+import { click } from '@test/util';
 import { LoginCardComponent } from './login-card.component';
 
 describe('LoginCardComponent', () => {
@@ -33,6 +31,24 @@ describe('LoginCardComponent', () => {
     expect(title.nativeElement.textContent.trim()).toBe('Login');
   });
 
+  describe('use session', () => {
+    it('initializes the vault type when toggled true', async () => {
+      const vault = TestBed.inject(SessionVaultService);
+      component.useSessionLocking = true;
+      await component.useSessionLockingChanged();
+      expect(vault.initializeUnlockMode).toHaveBeenCalledTimes(1);
+      expect(vault.resetUnlockMode).not.toHaveBeenCalled();
+    });
+
+    it('resets the vault type when toggled false', async () => {
+      const vault = TestBed.inject(SessionVaultService);
+      component.useSessionLocking = false;
+      await component.useSessionLockingChanged();
+      expect(vault.initializeUnlockMode).not.toHaveBeenCalled();
+      expect(vault.resetUnlockMode).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('signin button', () => {
     let button: HTMLIonButtonElement;
     beforeEach(() => {
@@ -57,13 +73,6 @@ describe('LoginCardComponent', () => {
           const auth = TestBed.inject(AuthenticationService);
           (auth.login as jasmine.Spy).and.resolveTo(undefined);
         });
-
-        it('initializes the vault type', fakeAsync(() => {
-          const vault = TestBed.inject(SessionVaultService);
-          click(fixture, button);
-          tick();
-          expect(vault.initializeUnlockMode).toHaveBeenCalledTimes(1);
-        }));
 
         it('emits success', fakeAsync(() => {
           spyOn(component.loginSuccess, 'emit');

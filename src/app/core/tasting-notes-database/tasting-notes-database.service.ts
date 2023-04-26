@@ -3,17 +3,12 @@ import { Injectable } from '@angular/core';
 import { TastingNote } from '@app/models';
 import { AuthenticationService } from '../authentication/authentication.service';
 import { DatabaseService } from '../database/database.service';
-import { SessionVaultService } from '../session-vault/session-vault.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TastingNotesDatabaseService {
-  constructor(
-    private database: DatabaseService,
-    private vault: SessionVaultService,
-    private authentication: AuthenticationService
-  ) {}
+  constructor(private database: DatabaseService, private authentication: AuthenticationService) {}
 
   async getAll(includeDeleted = false): Promise<Array<TastingNote>> {
     const notes: Array<TastingNote> = [];
