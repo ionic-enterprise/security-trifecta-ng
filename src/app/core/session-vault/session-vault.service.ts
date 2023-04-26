@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Session } from '@app/models';
 import { PinDialogComponent } from '@app/pin-dialog/pin-dialog.component';
+import { AuthResult } from '@ionic-enterprise/auth';
 import {
   BiometricPermissionState,
   BrowserVault,
@@ -50,12 +50,12 @@ export class SessionVaultService {
     }
   }
 
-  async setSession(session: Session): Promise<void> {
+  async setSession(session: AuthResult): Promise<void> {
     await this.initialize();
     return this.vault.setValue('session', session);
   }
 
-  async getSession(): Promise<Session | null> {
+  async getSession(): Promise<AuthResult | null> {
     await this.initialize();
     return this.vault.getValue('session');
   }

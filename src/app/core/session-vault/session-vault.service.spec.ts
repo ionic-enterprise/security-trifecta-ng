@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { Session } from '@app/models';
 import { PinDialogComponent } from '@app/pin-dialog/pin-dialog.component';
+import { AuthResult } from '@ionic-enterprise/auth';
 import {
   BiometricPermissionState,
   Device,
@@ -184,16 +184,12 @@ describe('SessionVaultService', () => {
 
   describe('set session', () => {
     it('sets the session', async () => {
-      const session: Session = {
-        user: {
-          id: 42993,
-          email: 'test@test.com',
-          firstName: 'Testy',
-          lastName: 'McTest',
-        },
-        token: 'test-token',
+      const session = {
+        accessToken: 'test-access-token',
+        refreshToken: 'test-refresh-token',
+        idToken: 'test-id-token',
       };
-      await service.setSession(session);
+      await service.setSession(session as AuthResult);
       expect(mockVault.setValue).toHaveBeenCalledTimes(1);
       expect(mockVault.setValue).toHaveBeenCalledWith('session', session);
     });
@@ -209,24 +205,16 @@ describe('SessionVaultService', () => {
     it('resolves the session returned from the vault', async () => {
       (mockVault.getValue as jasmine.Spy).and.returnValue(
         Promise.resolve({
-          user: {
-            id: 42993,
-            email: 'test@test.com',
-            firstName: 'Testy',
-            lastName: 'McTest',
-          },
-          token: 'test-token',
+          accessToken: 'test-access-token',
+          refreshToken: 'test-refresh-token',
+          idToken: 'test-id-token',
         })
       );
       expect(await service.getSession()).toEqual({
-        user: {
-          id: 42993,
-          email: 'test@test.com',
-          firstName: 'Testy',
-          lastName: 'McTest',
-        },
-        token: 'test-token',
-      });
+        accessToken: 'test-access-token',
+        refreshToken: 'test-refresh-token',
+        idToken: 'test-id-token',
+      } as AuthResult);
     });
   });
 
