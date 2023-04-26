@@ -18,10 +18,9 @@ import {
 } from '@app/core/testing';
 import { TastingNote } from '@app/models';
 import { TastingNoteEditorComponent } from '@app/tasting-note-editor/tasting-note-editor.component';
-import { ModalController, NavController, ToastController } from '@ionic/angular';
+import { IonRouterOutlet, ModalController, NavController, ToastController } from '@ionic/angular';
 import { createNavControllerMock, createOverlayControllerMock, createOverlayElementMock } from '@test/mocks';
 import { click } from '@test/util';
-import { of } from 'rxjs';
 import { TastingNotesPage } from './tasting-notes.page';
 
 describe('TastingNotesPage', () => {
@@ -32,6 +31,10 @@ describe('TastingNotesPage', () => {
   let notes: Array<TastingNote>;
   let modalController: ModalController;
   let toastController: ToastController;
+
+  const mockRouterOutlet = {
+    nativeEl: {},
+  };
 
   beforeEach(async () => {
     modal = createOverlayElementMock('Modal');
@@ -44,6 +47,7 @@ describe('TastingNotesPage', () => {
       providers: [],
     })
       .overrideProvider(AuthenticationService, { useFactory: createAuthenticationServiceMock })
+      .overrideProvider(IonRouterOutlet, { useValue: mockRouterOutlet })
       .overrideProvider(ModalController, { useValue: modalController })
       .overrideProvider(NavController, { useFactory: createNavControllerMock })
       .overrideProvider(PreferencesService, { useFactory: createPreferencesServiceMock })
@@ -112,6 +116,7 @@ describe('TastingNotesPage', () => {
       expect(modalController.create).toHaveBeenCalledWith({
         component: TastingNoteEditorComponent,
         backdropDismiss: false,
+        presentingElement: mockRouterOutlet.nativeEl as any,
       });
     }));
 
@@ -138,6 +143,7 @@ describe('TastingNotesPage', () => {
       expect(modalController.create).toHaveBeenCalledWith({
         component: TastingNoteEditorComponent,
         backdropDismiss: false,
+        presentingElement: mockRouterOutlet.nativeEl as any,
         componentProps: { note: notes[1] },
       });
     }));

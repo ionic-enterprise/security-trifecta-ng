@@ -11,7 +11,14 @@ import {
 } from '@app/core';
 import { TastingNote } from '@app/models';
 import { TastingNoteEditorComponent } from '@app/tasting-note-editor/tasting-note-editor.component';
-import { IonicModule, ModalController, ModalOptions, NavController, ToastController } from '@ionic/angular';
+import {
+  IonicModule,
+  IonRouterOutlet,
+  ModalController,
+  ModalOptions,
+  NavController,
+  ToastController,
+} from '@ionic/angular';
 
 @Component({
   selector: 'app-tasting-notes',
@@ -29,6 +36,7 @@ export class TastingNotesPage implements OnInit {
     private navController: NavController,
     private modalController: ModalController,
     private preferences: PreferencesService,
+    private routerOutlet: IonRouterOutlet,
     private sessionVault: SessionVaultService,
     private sync: SyncService,
     private toastController: ToastController,
@@ -54,6 +62,7 @@ export class TastingNotesPage implements OnInit {
     let opt: ModalOptions = {
       component: TastingNoteEditorComponent,
       backdropDismiss: false,
+      presentingElement: this.routerOutlet.nativeEl,
     };
     if (note) {
       opt = { ...opt, componentProps: { note } };
