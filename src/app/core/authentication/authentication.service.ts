@@ -24,7 +24,7 @@ export class AuthenticationService {
       this.provider,
       this.isMobile ? environment.mobileAuthConfig : environment.webAuthConfig
     );
-    this.sessionVault.setSession(authResult);
+    await this.sessionVault.setSession(authResult);
   }
 
   async logout(): Promise<void> {
@@ -34,6 +34,7 @@ export class AuthenticationService {
       await AuthConnect.logout(this.provider, authResult);
       await this.sessionVault.clearSession();
     }
+    await this.sessionVault.resetUnlockMode();
   }
 
   async isAuthenticated(): Promise<boolean> {

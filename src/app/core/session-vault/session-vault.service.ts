@@ -52,7 +52,7 @@ export class SessionVaultService {
 
   async setSession(session: AuthResult): Promise<void> {
     await this.initialize();
-    return this.vault.setValue('session', session);
+    await this.vault.setValue('session', session);
   }
 
   async getSession(): Promise<AuthResult | null> {
