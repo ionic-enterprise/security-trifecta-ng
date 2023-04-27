@@ -32,6 +32,10 @@ describe('LoginCardComponent', () => {
   });
 
   describe('use session', () => {
+    beforeEach(() => {
+      const vault = TestBed.inject(SessionVaultService);
+      (vault.resetUnlockMode as jasmine.Spy).calls.reset();
+    });
     it('initializes the vault type when toggled true', async () => {
       const vault = TestBed.inject(SessionVaultService);
       component.useSessionLocking = true;

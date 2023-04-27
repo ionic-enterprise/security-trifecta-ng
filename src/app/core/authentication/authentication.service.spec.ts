@@ -75,7 +75,7 @@ const testAuthResult = {
         const sessionVault = TestBed.inject(SessionVaultService);
         await service.login();
         expect(sessionVault.setSession).toHaveBeenCalledTimes(1);
-        expect(sessionVault.setSession).toHaveBeenCalledWith(testAuthResult as any); // TODO: as AuthResult
+        expect(sessionVault.setSession).toHaveBeenCalledWith(testAuthResult as AuthResult);
       });
     });
 
@@ -162,7 +162,7 @@ const testAuthResult = {
                 const sessionVault = TestBed.inject(SessionVaultService);
                 await service.isAuthenticated();
                 expect(sessionVault.setSession).toHaveBeenCalledTimes(1);
-                expect(sessionVault.setSession).toHaveBeenCalledWith(refreshedAuthResult as any); // TODO: as AuthResult
+                expect(sessionVault.setSession).toHaveBeenCalledWith(refreshedAuthResult as AuthResult);
               });
 
               it('resolves true', async () => {
@@ -294,7 +294,7 @@ const testAuthResult = {
                 const sessionVault = TestBed.inject(SessionVaultService);
                 await service.getAccessToken();
                 expect(sessionVault.setSession).toHaveBeenCalledTimes(1);
-                expect(sessionVault.setSession).toHaveBeenCalledWith(refreshedAuthResult as any); // TODO: as AuthResult
+                expect(sessionVault.setSession).toHaveBeenCalledWith(refreshedAuthResult as AuthResult);
               });
 
               it('resolves the new token', async () => {

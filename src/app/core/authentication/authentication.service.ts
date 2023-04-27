@@ -24,14 +24,14 @@ export class AuthenticationService {
       this.provider,
       this.isMobile ? environment.mobileAuthConfig : environment.webAuthConfig
     );
-    this.sessionVault.setSession(authResult as any);
+    this.sessionVault.setSession(authResult);
   }
 
   async logout(): Promise<void> {
     await this.initialize();
     const authResult = await this.sessionVault.getSession();
     if (authResult) {
-      await AuthConnect.logout(this.provider, authResult as any);
+      await AuthConnect.logout(this.provider, authResult);
       await this.sessionVault.clearSession();
     }
   }
@@ -51,7 +51,7 @@ export class AuthenticationService {
     await this.initialize();
     const authResult = await this.sessionVault.getSession();
     if (authResult) {
-      const { email } = (await AuthConnect.decodeToken(TokenType.id, authResult as any)) as { email?: string };
+      const { email } = (await AuthConnect.decodeToken(TokenType.id, authResult)) as { email?: string };
       return email;
     }
   }
@@ -85,7 +85,7 @@ export class AuthenticationService {
     if (await AuthConnect.isRefreshTokenAvailable(authResult)) {
       try {
         newAuthResult = await AuthConnect.refreshSession(this.provider, authResult);
-        this.sessionVault.setSession(newAuthResult as any);
+        this.sessionVault.setSession(newAuthResult);
       } catch (err) {
         await this.sessionVault.clearSession();
       }
@@ -97,7 +97,7 @@ export class AuthenticationService {
   }
 
   private async getAuthResult(): Promise<AuthResult | null | undefined> {
-    let authResult = (await this.sessionVault.getSession()) as any;
+    let authResult = await this.sessionVault.getSession();
     if (authResult && (await AuthConnect.isAccessTokenExpired(authResult))) {
       authResult = await this.performRefresh(authResult);
     }

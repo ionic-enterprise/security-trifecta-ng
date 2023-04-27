@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthenticationService, SessionVaultService } from '@app/core';
 import { IonicModule, Platform } from '@ionic/angular';
@@ -11,7 +11,7 @@ import { IonicModule, Platform } from '@ionic/angular';
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule],
 })
-export class LoginCardComponent {
+export class LoginCardComponent implements OnInit {
   @Output() loginSuccess = new EventEmitter<void>();
 
   showSessionLocking: boolean;
@@ -24,6 +24,10 @@ export class LoginCardComponent {
     private sessionVault: SessionVaultService
   ) {
     this.showSessionLocking = platform.is('hybrid');
+  }
+
+  async ngOnInit() {
+    await this.sessionVault.resetUnlockMode();
   }
 
   async signIn() {

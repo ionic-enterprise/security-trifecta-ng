@@ -41,11 +41,11 @@ describe('SessionVaultService', () => {
     };
     preferencesVault = jasmine.createSpyObj<Vault>('PreferencesVault', { ...vaultObject });
     mockVault = jasmine.createSpyObj<Vault>('Vault', { ...vaultObject });
-    (mockVault.onLock as any).and.callFake((callback: () => void) => (onLockCallback = callback));
-    (mockVault.onPasscodeRequested as any).and.callFake(
+    (mockVault.onLock as jasmine.Spy).and.callFake((callback: () => void) => (onLockCallback = callback));
+    (mockVault.onPasscodeRequested as jasmine.Spy).and.callFake(
       (callback: (flag: boolean) => Promise<void>) => (onPasscodeRequestedCallback = callback)
     );
-    (mockVault.lock as any).and.callFake(() => onLockCallback());
+    (mockVault.lock as jasmine.Spy).and.callFake(() => onLockCallback());
     mockVault.config = {
       key: 'test',
       type: VaultType.SecureStorage,
@@ -69,7 +69,7 @@ describe('SessionVaultService', () => {
     });
     service = TestBed.inject(SessionVaultService);
     const factory = TestBed.inject(VaultFactoryService);
-    (factory.create as any)
+    (factory.create as jasmine.Spy)
       .withArgs({
         key: 'io.ionic.auth-playground-ng-preferences',
         type: VaultType.SecureStorage,
@@ -97,7 +97,7 @@ describe('SessionVaultService', () => {
     describe('on mobile', () => {
       beforeEach(() => {
         const platform = TestBed.inject(Platform);
-        (platform.is as any).withArgs('hybrid').and.returnValue(true);
+        (platform.is as jasmine.Spy).withArgs('hybrid').and.returnValue(true);
       });
 
       it('uses a session PIN if no system PIN is set', async () => {
@@ -172,7 +172,7 @@ describe('SessionVaultService', () => {
     describe('on web', () => {
       beforeEach(() => {
         const platform = TestBed.inject(Platform);
-        (platform.is as any).withArgs('hybrid').and.returnValue(false);
+        (platform.is as jasmine.Spy).withArgs('hybrid').and.returnValue(false);
       });
 
       it('does not update the config', async () => {
@@ -247,7 +247,7 @@ describe('SessionVaultService', () => {
 
   describe('onPasscodeRequested', () => {
     beforeEach(async () => {
-      (modal.onDidDismiss as any).and.returnValue(Promise.resolve({ role: 'cancel' }));
+      (modal.onDidDismiss as jasmine.Spy).and.returnValue(Promise.resolve({ role: 'cancel' }));
       await service.getSession(); // just done to init the vault
     });
 
@@ -272,7 +272,7 @@ describe('SessionVaultService', () => {
     });
 
     it('sets the custom passcode to the PIN', async () => {
-      (modal.onDidDismiss as any).and.returnValue(Promise.resolve({ data: '4203', role: 'OK' }));
+      (modal.onDidDismiss as jasmine.Spy).and.returnValue(Promise.resolve({ data: '4203', role: 'OK' }));
       await onPasscodeRequestedCallback(false);
       expect(mockVault.setCustomPasscode).toHaveBeenCalledTimes(1);
       expect(mockVault.setCustomPasscode).toHaveBeenCalledWith('4203');
