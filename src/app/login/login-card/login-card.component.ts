@@ -14,6 +14,7 @@ import { IonicModule, Platform } from '@ionic/angular';
 export class LoginCardComponent {
   @Output() loginSuccess = new EventEmitter<void>();
 
+  authenticating = false;
   showSessionLocking: boolean;
   useSessionLocking: boolean;
   errorMessage: string;
@@ -28,8 +29,10 @@ export class LoginCardComponent {
 
   async signIn() {
     try {
+      this.authenticating = true;
       await this.authentication.login();
       this.loginSuccess.emit();
+      this.authenticating = false;
     } catch (err) {
       this.errorMessage = 'Invalid email or password';
     }

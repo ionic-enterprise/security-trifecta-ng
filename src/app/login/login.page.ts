@@ -14,6 +14,7 @@ import { UnlockCardComponent } from './unlock-card/unlock-card.component';
 })
 export class LoginPage implements OnInit {
   showUnlock: boolean;
+  syncing = false;
 
   constructor(
     private navController: NavController,
@@ -26,8 +27,10 @@ export class LoginPage implements OnInit {
   }
 
   async onLoginSuccess(): Promise<void> {
+    this.syncing = true;
     await this.sync.execute();
     this.navController.navigateRoot(['/', 'tasting-notes']);
+    this.syncing = false;
   }
 
   onUnlock(): void {

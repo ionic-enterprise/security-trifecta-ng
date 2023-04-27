@@ -3,4 +3,5 @@
     <app-unlock-card *ngIf="showUnlock" (unlock)="onUnlock()" (vaultClear)="onVaultClear()" data-testid="unlock-card" />
     <app-login-card *ngIf="!showUnlock" (loginSuccess)="onLoginSuccess()" data-testid="login-card" />
   </div>
+  <ion-loading [isOpen]="syncing" message="Syncing..."></ion-loading>
 </ion-content>
