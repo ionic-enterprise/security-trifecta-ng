@@ -30,11 +30,14 @@ export class LoginCardComponent {
   async signIn() {
     try {
       this.authenticating = true;
+      await this.sessionVault.disableLocking();
       await this.authentication.login();
       this.loginSuccess.emit();
-      this.authenticating = false;
     } catch (err) {
       this.errorMessage = 'Invalid email or password';
+    } finally {
+      this.authenticating = false;
+      await this.sessionVault.enableLocking();
     }
   }
 

@@ -34,6 +34,22 @@ export class SessionVaultService {
     return this.lockedSubject.asObservable();
   }
 
+  async disableLocking(): Promise<void> {
+    await this.initialize();
+    return this.vault.updateConfig({
+      ...this.vault.config,
+      lockAfterBackgrounded: null,
+    });
+  }
+
+  async enableLocking(): Promise<void> {
+    await this.initialize();
+    return this.vault.updateConfig({
+      ...this.vault.config,
+      lockAfterBackgrounded: 2000,
+    });
+  }
+
   async resetUnlockMode(): Promise<void> {
     await this.initialize();
     await this.setUnlockMode('NeverLock');
@@ -83,7 +99,7 @@ export class SessionVaultService {
         this.vault = this.vaultFactory.create({
           key: 'io.ionic.auth-playground-ng',
           type: VaultType.SecureStorage,
-          lockAfterBackgrounded: 2000,
+          lockAfterBackgrounded: null,
           shouldClearVaultAfterTooManyFailedAttempts: true,
           customPasscodeInvalidUnlockAttempts: 2,
           unlockVaultOnLoad: false,
