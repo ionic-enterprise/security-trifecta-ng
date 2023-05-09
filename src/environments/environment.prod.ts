@@ -11,14 +11,14 @@ const baseConfig: ProviderOptions = {
 
 const mobileAuthConfig: ProviderOptions = {
   ...baseConfig,
-  redirectUri: 'msauth://login',
-  logoutUrl: 'msauth://login',
+  redirectUri: 'msauth://auth-action-complete',
+  logoutUrl: 'msauth://auth-action-complete',
 };
 
 const webAuthConfig: ProviderOptions = {
   ...baseConfig,
-  redirectUri: 'http://localhost:8100/login',
-  logoutUrl: 'http://localhost:8100/login',
+  redirectUri: 'http://localhost:8100/auth-action-complete',
+  logoutUrl: 'http://localhost:8100/auth-action-complete',
 };
 
 export const environment = {
