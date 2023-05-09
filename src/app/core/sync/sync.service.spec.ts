@@ -54,7 +54,6 @@ describe('SyncService', () => {
     it('removes the ID for the INSERT items', async () => {
       const tastingNotesApiService = TestBed.inject(TastingNotesApiService);
       await service.execute();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, ...note } = tastingNotes[0];
       expect(tastingNotesApiService.save).toHaveBeenCalledWith(note);
     });

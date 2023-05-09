@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/quotes */
 import { Injectable } from '@angular/core';
 import { TastingNote } from '@app/models';
 import { AuthenticationService } from '../authentication/authentication.service';
