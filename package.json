@@ -37,7 +37,7 @@
     "@capacitor/status-bar": "^5.0.0",
     "@ionic-enterprise/auth": "~5.0.1",
     "@ionic-enterprise/identity-vault": "~5.10.1",
-    "@ionic-enterprise/secure-storage": "~3.0.1-0",
+    "@ionic-enterprise/secure-storage": "~3.0.1",
     "@ionic/angular": "~7.0.0-beta.2",
     "core-js": "~3.30.1",
     "date-fns": "~2.30.0",
