@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthenticationService, SessionVaultService } from '@app/core';
 import { VaultType } from '@ionic-enterprise/identity-vault';
 import { IonicModule, Platform } from '@ionic/angular';
+import { Preferences } from '@capacitor/preferences';
 
 @Component({
   selector: 'app-login-card',
@@ -31,9 +32,12 @@ export class LoginCardComponent implements OnInit {
 
   async ngOnInit() {
     this.vaultType = await this.sessionVault.getType();
-    setTimeout(async () => {
+    const { value } = await Preferences.get({ key: 'new-install' });
+    if (!value) {
+      await Preferences.set({ key: 'new-install', value: 'true' });
+      await this.sessionVault.resetUnlockMode();
       this.vaultType = await this.sessionVault.getType();
-    }, 3000);
+    }
   }
 
   async signIn() {
