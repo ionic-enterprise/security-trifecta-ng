@@ -34,6 +34,11 @@ export class SessionVaultService {
     return this.lockedSubject.asObservable();
   }
 
+  async getType(): Promise<VaultType> {
+    await this.initialize();
+    return this.vault.config.type;
+  }
+
   async disableLocking(): Promise<void> {
     await this.initialize();
     return this.vault.updateConfig({

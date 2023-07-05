@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthenticationService, SessionVaultService } from '@app/core';
+import { VaultType } from '@ionic-enterprise/identity-vault';
 import { IonicModule, Platform } from '@ionic/angular';
 
 @Component({
@@ -11,13 +12,14 @@ import { IonicModule, Platform } from '@ionic/angular';
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule],
 })
-export class LoginCardComponent {
+export class LoginCardComponent implements OnInit {
   @Output() loginSuccess = new EventEmitter<void>();
 
   authenticating = false;
   showSessionLocking: boolean;
   useSessionLocking: boolean;
   errorMessage: string;
+  vaultType: VaultType;
 
   constructor(
     platform: Platform,
@@ -25,6 +27,13 @@ export class LoginCardComponent {
     private sessionVault: SessionVaultService
   ) {
     this.showSessionLocking = platform.is('hybrid');
+  }
+
+  async ngOnInit() {
+    this.vaultType = await this.sessionVault.getType();
+    setTimeout(async () => {
+      this.vaultType = await this.sessionVault.getType();
+    }, 3000);
   }
 
   async signIn() {
@@ -47,5 +56,6 @@ export class LoginCardComponent {
     } else {
       await this.sessionVault.resetUnlockMode();
     }
+    this.vaultType = await this.sessionVault.getType();
   }
 }
